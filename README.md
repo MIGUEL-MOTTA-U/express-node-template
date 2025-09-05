@@ -18,6 +18,10 @@ Si tienes alguna sugerencia o comentario, no dudes en conactarme o hacer un fork
 ## 📦 Dependencias
 
 ### Producción
+- `express` - Framework principal para APIs
+- `cors` - Middleware para habilitar CORS
+- `helmet` - Seguridad HTTP headers
+- `express-rate-limit` - Protección contra abuso de peticiones
 - `dotenv` - Variables de entorno
 
 ### Desarrollo
@@ -33,10 +37,33 @@ Si tienes alguna sugerencia o comentario, no dudes en conactarme o hacer un fork
 ## ⚙️ Configuración
 
 ### Biome (`biome.json`)
-- ✅ Linting con reglas recomendadas
-- ✅ Formateo automático (espacios, comillas simples, semicolons)
-- ✅ Organización de imports
-- ✅ Detección de variables no usadas y `any` explícitos
+
+### Express y Plugins
+
+El servidor Express está configurado con los siguientes middlewares:
+
+- **Helmet**: Refuerza la seguridad HTTP con políticas como CSP, COEP, COOP, CORP, HSTS y más.
+- **CORS**: Permite solicitudes desde cualquier origen (configurable).
+- **express-rate-limit**: Limita el número de peticiones por IP para evitar abusos.
+- **dotenv**: Carga variables de entorno desde `.env`.
+- **express.json()**: Habilita el parseo de JSON en las peticiones.
+
+Ejemplo de configuración en `src/server.ts`:
+
+```typescript
+import cors from 'cors';
+import { config } from 'dotenv';
+import express from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+
+config();
+const server = express();
+server.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] }));
+server.use(helmet({ contentSecurityPolicy: true, hsts: { maxAge: 15552000 } }));
+server.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+server.use(express.json());
+```
 
 ### TypeScript (`tsconfig.json`)
 - ✅ Target ES2022 con módulos NodeNext
